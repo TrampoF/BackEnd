@@ -1,0 +1,23 @@
+{
+    "dockerComposeFile": "../docker-compose.dev.yml",
+    "remoteUser": "dev",
+    "workspaceFolder": "/home/dev/app",
+    "service": "app",
+    "shutdownAction": "stopCompose",
+    "postCreateCommand": "bash ./.devcontainer/post-install.sh",
+    "features": {
+        "ghcr.io/devcontainers/features/common-utils:2": {},
+        "ghcr.io/stuartleeks/dev-container-features/shell-history:0": {},
+        "ghcr.io/nils-geistmann/devcontainers-features/zsh:0": {}
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.pylint",
+                "ms-python.black-formatter",
+                "ms-azuretools.vscode-docker"
+            ]
+        }
+    }
+}
