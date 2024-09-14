@@ -22,4 +22,5 @@ class Channel(Base):
     channel_name = Column(String)
     created_at = Column(DateTime)
     updated_at = Column(DateTime)
+    created_at = Column(DateTime, nullable=True)
     user = relationship("User", foreign_keys=user_id, back_populates="channels")

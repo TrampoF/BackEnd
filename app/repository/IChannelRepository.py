@@ -21,3 +21,9 @@ class IChannelRepository(ABC):
         """
         Retrieve a channel by its ID.
         """
+
+    @abstractmethod
+    def create_channel(self, channel_data: dict):
+        """
+        Create a new channel.
+        """

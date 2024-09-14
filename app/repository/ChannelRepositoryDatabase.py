@@ -11,7 +11,7 @@ from app.models.Channel import Channel
 from app.repository.IChannelRepository import IChannelRepository
 
 
-class ChannelRepository(IChannelRepository):
+class ChannelRepositoryDatabase(IChannelRepository):
     """
     ChannelRepository implements the IChannelRepository
     interface for channel-related database operations.
@@ -26,4 +26,10 @@ class ChannelRepository(IChannelRepository):
 
     def get_channel_by_id(self, channel_id: int):
         channel = self._session.query(Channel).filter(Channel.id == channel_id).first()
+        return channel
+
+    def create_channel(self, channel_data: dict):
+        channel = Channel(**channel_data)
+        self._session.add(channel)
+        self._session.commit()
         return channel
