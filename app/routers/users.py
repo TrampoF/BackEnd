@@ -1,11 +1,6 @@
-"""
-This module defines the users router.
-"""
-
 from fastapi import APIRouter, Depends
 
-from app.application.GetAllUsers import GetAllUsers
-from app.repository.UserRepository import UserRepository
+from app.repository.user_repository import UserRepository
 
 
 router = APIRouter(
@@ -14,10 +9,9 @@ router = APIRouter(
 )
 
 
-@router.get("/")
-async def read_users(user_repository: UserRepository = Depends()):
+@router.get("/register")
+async def register_user(user_repository: UserRepository = Depends()):
     """
-    Retrieve a list of users from the repository.
+    Register a user.
     """
-    users = GetAllUsers(user_repository=user_repository).run()
-    return users
+    return {"message": user_repository}

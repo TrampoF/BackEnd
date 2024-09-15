@@ -1,7 +1,3 @@
-"""
-This module defines the IChannelRepository interface.
-"""
-
 from abc import ABC, abstractmethod
 
 

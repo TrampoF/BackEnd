@@ -1,13 +1,9 @@
-"""
-This module contains the UserRepository class which implements the IUserRepository interface.
-"""
-
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
-from app.database.DatabaseConnection import PostgresAdapter
-from app.models.User import User
-from app.repository.IUserRepository import IUserRepository
+from app.database.database_connection import PostgresAdapter
+from app.models.user import User
+from app.repository.iuser_repository import IUserRepository
 
 
 class UserRepository(IUserRepository):

@@ -1,14 +1,10 @@
-"""
-This module contains the ChannelRepository class which implements the IChannelRepository interface.
-"""
-
 from fastapi import Depends
 from sqlalchemy.orm import Session
 
 
-from app.database.DatabaseConnection import PostgresAdapter
-from app.models.Channel import Channel
-from app.repository.IChannelRepository import IChannelRepository
+from app.database.database_connection import PostgresAdapter
+from app.models.channel import Channel
+from app.repository.ichannel_repository import IChannelRepository
 
 
 class ChannelRepository(IChannelRepository):

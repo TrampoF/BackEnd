@@ -1,7 +1,3 @@
-"""
-This module defines the interface for database connections.
-"""
-
 from abc import ABC, abstractmethod
 
 

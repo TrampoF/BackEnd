@@ -1,11 +1,7 @@
-"""
-This module defines the Channel model.
-"""
-
 from sqlalchemy import DateTime, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
-from app.database.DatabaseConnection import Base
+from app.database.database_connection import Base
 
 
 class Channel(Base):

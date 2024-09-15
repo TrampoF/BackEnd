@@ -1,12 +1,8 @@
-"""
-This module provides a PostgreSQL connection using SQLAlchemy.
-"""
-
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
-from app.database.IDatabaseConnection import IDatabaseConnection
+from app.database.i_database_connection import IDatabaseConnection
 
 Base = declarative_base()
 

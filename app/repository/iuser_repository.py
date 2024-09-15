@@ -1,8 +1,5 @@
-"""
-This module defines the IUserRepository interface.
-"""
-
 from abc import ABC, abstractmethod
+from uuid import UUID
 
 
 class IUserRepository(ABC):
@@ -17,7 +14,13 @@ class IUserRepository(ABC):
         """
 
     @abstractmethod
-    def get_by_id(self, user_id):
+    def create_user(self, user: dict):
         """
-        Retrieve a user by their ID.
+        Insert user into users table
+        """
+
+    @abstractmethod
+    def get_by_id(self, user_id: UUID):
+        """
+        Retrieve an user by id
         """

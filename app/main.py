@@ -1,7 +1,3 @@
-"""
-This module initializes the FastAPI application and includes the application routers.
-"""
-
 from fastapi import FastAPI
 
 from .routers import channels, users
