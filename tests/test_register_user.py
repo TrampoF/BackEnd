@@ -1,94 +1,101 @@
 """
-This module contains test cases for the user registration functionality.
+This module contains test cases for the profile registration functionality.
 """
 
 from pydantic_core import ValidationError
 import pytest
-from app.application.get_user import GetUser
-from app.application.register_user import RegisterUser
+from app.application.get_profile import GetProfile
+from app.application.register_profile import RegisterProfile
+from app.database.database_connection import PostgresAdapter
+from app.database.supabase_adapter import SupabaseAdapter
 from app.exceptions.invalid_email_format_exception import InvalidEmailFormatException
 from app.exceptions.password_confirmation_dot_not_match_exception import (
     PasswordConfirmationDotNotMatchException,
 )
-from app.repository.user_repository_memory import UserRepositoryMemory
+from app.repository.profile_repository_database import ProfileRepositoryDatabase
+from app.repository.profile_repository_memory import ProfileRepositoryMemory
+from app.repository.profile_repository_supabase import ProfileRepositorySupabase
 
-user_repository: UserRepositoryMemory = UserRepositoryMemory()
+profile_repository: ProfileRepositorySupabase = ProfileRepositorySupabase(
+    client=SupabaseAdapter().get_db()
+)
+
+# profile_repository: ProfileRepositoryMemory = ProfileRepositoryMemory()
 
 
-class TestRegisterUser:
+class TestRegisterProfile:
     """
-    Test suite for user registration functionality.
+    Test suite for profile registration functionality.
     """
 
-    def test_should_register_user(self):
+    def test_should_register_profile(self):
         """
-        Test that user should be registered
+        Test that profile should be registered
         """
-        user_data = {
+        profile_data = {
             "first_name": "Foo",
             "last_name": "Bar",
             "email": "foo@bar.com",
-            "username": "fooBar",
             "password": "password",
             "password_confirmation": "password",
         }
-        registered_user_id = RegisterUser(user_repository=user_repository).execute(
-            data=user_data
+        registered_profile_id = RegisterProfile(
+            profile_repository=profile_repository
+        ).execute(data=profile_data)
+        registered_profile = GetProfile(profile_repository=profile_repository).execute(
+            profile_id=registered_profile_id
         )
-        registered_user = GetUser(user_repository=user_repository).execute(
-            user_id=registered_user_id
-        )
-        assert registered_user_id == registered_user.id
-        assert user_data["first_name"] == registered_user.first_name
-        assert user_data["last_name"] == registered_user.last_name
-        assert user_data["email"] == registered_user.email
-        assert user_data["username"] == registered_user.username
+        assert registered_profile_id == registered_profile.id
+        assert profile_data["first_name"] == registered_profile.first_name
+        assert profile_data["last_name"] == registered_profile.last_name
+        assert profile_data["email"] == registered_profile.email
         assert (
-            f'{user_data["first_name"]} {user_data["last_name"]}'
-            == registered_user.full_name
+            f'{profile_data["first_name"]} {profile_data["last_name"]}'
+            == registered_profile.full_name
         )
 
-    def test_should_not_register_user_with_different_password_and_password_confirmation(
+    def test_should_not_register_profile_with_different_password_and_password_confirmation(
         self,
     ):
         """
-        Test that user should not be registered if password and password confimation is different
+        Test that profile should not be registered if password and password confimation is different
         """
-        user_data = {
+        profile_data = {
             "first_name": "Foo",
             "last_name": "Bar",
             "email": "foo@bar.com",
-            "username": "fooBar",
             "password": "password",
             "password_confirmation": "password1232",
         }
         with pytest.raises(PasswordConfirmationDotNotMatchException) as excinfo:
-            RegisterUser(user_repository=user_repository).execute(data=user_data)
+            RegisterProfile(profile_repository=profile_repository).execute(
+                data=profile_data
+            )
         assert str(excinfo.value) == "Password and password confirmation do not match!"
 
-    def test_should_not_register_user_with_wrong_email_format(self):
+    def test_should_not_register_profile_with_wrong_email_format(self):
         """
-        Test that user should not be registered if email do not match the corrrect format
+        Test that profile should not be registered if email do not match the corrrect format
         """
-        user_data = {
+        profile_data = {
             "first_name": "Foo",
             "last_name": "Bar",
             "email": "foobar.com",
-            "username": "fooBar",
             "password": "password",
             "password_confirmation": "password",
         }
         with pytest.raises(InvalidEmailFormatException) as excinfo:
-            RegisterUser(user_repository=user_repository).execute(data=user_data)
+            RegisterProfile(profile_repository=profile_repository).execute(
+                data=profile_data
+            )
         assert str(excinfo.value) == "Invalid email format"
 
-    user_empty_field_data = [
+    profile_empty_field_data = [
         (
             {
                 "first_name": "",
                 "last_name": "Bar",
                 "email": "foo@bar.com",
-                "username": "fooBar",
                 "password": "password",
                 "password_confirmation": "password",
             },
@@ -99,7 +106,6 @@ class TestRegisterUser:
                 "first_name": "Foo",
                 "last_name": "",
                 "email": "foo@bar.com",
-                "username": "fooBar",
                 "password": "password",
                 "password_confirmation": "password",
             },
@@ -110,7 +116,6 @@ class TestRegisterUser:
                 "first_name": "Foo",
                 "last_name": "Bar",
                 "email": "",
-                "username": "fooBar",
                 "password": "password",
                 "password_confirmation": "password",
             },
@@ -121,18 +126,6 @@ class TestRegisterUser:
                 "first_name": "Foo",
                 "last_name": "Bar",
                 "email": "foo@bar.com",
-                "username": "",
-                "password": "password",
-                "password_confirmation": "password",
-            },
-            "String should have at least 1 character",
-        ),
-        (
-            {
-                "first_name": "Foo",
-                "last_name": "Bar",
-                "email": "foo@bar.com",
-                "username": "fooBar",
                 "password": "",
                 "password_confirmation": "password",
             },
@@ -140,47 +133,21 @@ class TestRegisterUser:
         ),
     ]
 
-    @pytest.mark.parametrize("test_input, expected", user_empty_field_data)
-    def test_should_not_register_user_with_empty_field(self, test_input, expected):
+    @pytest.mark.parametrize("test_input, expected", profile_empty_field_data)
+    def test_should_not_register_profile_with_empty_field(self, test_input, expected):
         """
-        Test that user should not be registered if any required data is empty
+        Test that profile should not be registered if any required data is empty
         """
 
         with pytest.raises(ValidationError) as excinfo:
-            RegisterUser(user_repository=user_repository).execute(data=test_input)
+            RegisterProfile(profile_repository=profile_repository).execute(
+                data=test_input
+            )
         assert str(excinfo.value.errors()[0]["msg"]) == expected
 
-    user_missing_field_data = [
+    profile_missing_field_data = [
         (
             {
-                "last_name": "Bar",
-                "email": "foo@bar.com",
-                "username": "fooBar",
-                "password": "password",
-                "password_confirmation": "password",
-            }
-        ),
-        (
-            {
-                "first_name": "Foo",
-                "email": "foo@bar.com",
-                "username": "fooBar",
-                "password": "password",
-                "password_confirmation": "password",
-            }
-        ),
-        (
-            {
-                "first_name": "Foo",
-                "last_name": "Bar",
-                "username": "fooBar",
-                "password": "password",
-                "password_confirmation": "password",
-            }
-        ),
-        (
-            {
-                "first_name": "Foo",
                 "last_name": "Bar",
                 "email": "foo@bar.com",
                 "password": "password",
@@ -190,9 +157,16 @@ class TestRegisterUser:
         (
             {
                 "first_name": "Foo",
-                "last_name": "Bar",
                 "email": "foo@bar.com",
-                "username": "fooBar",
+                "password": "password",
+                "password_confirmation": "password",
+            }
+        ),
+        (
+            {
+                "first_name": "Foo",
+                "last_name": "Bar",
+                "password": "password",
                 "password_confirmation": "password",
             }
         ),
@@ -201,27 +175,36 @@ class TestRegisterUser:
                 "first_name": "Foo",
                 "last_name": "Bar",
                 "email": "foo@bar.com",
-                "username": "fooBar",
+                "password_confirmation": "password",
+            }
+        ),
+        (
+            {
+                "first_name": "Foo",
+                "last_name": "Bar",
+                "email": "foo@bar.com",
                 "password": "password",
             }
         ),
     ]
 
-    @pytest.mark.parametrize("test_input", user_missing_field_data)
-    def test_should_not_register_user_with_missing_field(self, test_input):
+    @pytest.mark.parametrize("test_input", profile_missing_field_data)
+    def test_should_not_register_profile_with_missing_field(self, test_input):
         """
-        Test that user should not be registered if any required data is missing
+        Test that profile should not be registered if any required data is missing
         """
 
         with pytest.raises(ValidationError) as excinfo:
-            RegisterUser(user_repository=user_repository).execute(data=test_input)
+            RegisterProfile(profile_repository=profile_repository).execute(
+                data=test_input
+            )
         assert str(excinfo.value.errors()[0]["msg"]) == "Field required"
 
-    def test_should_not_register_user_with_an_username_or_email_already_registered(
+    def test_should_not_register_profile_with_an_profilename_or_email_already_registered(
         self,
     ):
         """
-        Test that user should not be registered if username or email is already registered
+        Test that profile should not be registered if profilename or email is already registered
         """
 
         assert False

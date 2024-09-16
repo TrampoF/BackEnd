@@ -2,14 +2,8 @@ services:
   app:
     build:
       context: .
-      dockerfile: docker/Dockerfile.dev
+      dockerfile: docker/app.Dockerfile.dev
     env_file:
       - .env
     volumes:
       - .:/home/dev/app
-    networks:
-      - app
-
-networks:
-  app:
-

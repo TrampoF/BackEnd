@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 
-from .routers import channels, users
+from app.routers import channels, profiles
 
 
 app = FastAPI()
 app.include_router(channels.router)
-app.include_router(users.router)
+app.include_router(profiles.router)

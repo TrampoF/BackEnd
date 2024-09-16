@@ -1,3 +1,4 @@
+import datetime
 import uuid
 from pydantic import (
     BaseModel,
@@ -7,22 +8,22 @@ from pydantic import (
     validate_email,
 )
 from pydantic_core import PydanticCustomError
+
 from app.exceptions.invalid_email_format_exception import InvalidEmailFormatException
 from app.exceptions.password_confirmation_dot_not_match_exception import (
     PasswordConfirmationDotNotMatchException,
 )
-from app.repository.iuser_repository import IUserRepository
+from app.repository.i_profile_repository import IProfileRepository
 
 
 class Input(BaseModel):
     """
-    Data transfer object for user registration.
+    Data transfer object for profile registration.
     """
 
     first_name: str = Field(..., min_length=1)
     last_name: str = Field(..., min_length=1)
     email: str = Field(..., min_length=1)
-    username: str = Field(..., min_length=1)
     password: str = Field(..., min_length=8)
     password_confirmation: str = Field(...)
 
@@ -54,23 +55,20 @@ class Input(BaseModel):
             raise InvalidEmailFormatException() from e
 
 
-class RegisterUser:
+class RegisterProfile:
     """
-    Entity to handle the registration of a new user.
+    Entity to handle the registration of a new profile.
     """
 
-    _user_repository: IUserRepository
+    _profile_repository: IProfileRepository
 
-    def __init__(self, user_repository: IUserRepository):
-        self._user_repository = user_repository
+    def __init__(self, profile_repository: IProfileRepository):
+        self._profile_repository = profile_repository
 
-    def execute(self, data: Input) -> uuid.UUID:
+    def execute(self, data: Input):
         """
-        Executes the user registration process.
+        Executes the profile registration process.
         """
-
         Input.model_validate(data)
-        user_id = uuid.uuid4()
-        data["id"] = user_id
-        self._user_repository.create_user(user=data)
-        return user_id
+        profile = self._profile_repository.register(data.model_dump())
+        return profile
