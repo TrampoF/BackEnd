@@ -1,11 +1,7 @@
-"""
-This module defines the Channel model.
-"""
-
 from sqlalchemy import DateTime, Column, ForeignKey, Integer, String
 from sqlalchemy.orm import relationship
 
-from app.database.DatabaseConnection import Base
+from app.database.database_connection import Base
 
 
 class Channel(Base):
@@ -16,10 +12,10 @@ class Channel(Base):
     __tablename__ = "channels"
 
     id = Column(Integer, primary_key=True, index=True)
-    user_id = Column(Integer, ForeignKey("users.id"))
+    profile_id = Column(Integer, ForeignKey("profiles.id"))
     chat_identifier = Column(String)
     api_key = Column(String)
     channel_name = Column(String)
     created_at = Column(DateTime)
     updated_at = Column(DateTime)
-    user = relationship("User", foreign_keys=user_id, back_populates="channels")
+    profile = relationship("Profiles", foreign_keys=profile_id, back_populates="channels")

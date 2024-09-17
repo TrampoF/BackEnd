@@ -1,7 +1,3 @@
-"""
-This module defines the channels router.
-"""
-
 from fastapi import APIRouter
 
 

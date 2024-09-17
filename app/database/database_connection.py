@@ -1,12 +1,10 @@
-"""
-This module provides a PostgreSQL connection using SQLAlchemy.
-"""
+import os
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 
-from app.database.IDatabaseConnection import IDatabaseConnection
+from app.database.i_database_connection import IDatabaseConnection
 
 Base = declarative_base()
 
@@ -17,7 +15,16 @@ class PostgresAdapter(IDatabaseConnection):
     """
 
     def __init__(self):
-        self._connection = create_engine("postgresql://postgres:123456@db:5432")
+        self._connection = create_engine(
+            "postgresql://%s:%s@%s:%s/%s"
+            % (
+                os.getenv("DB_USER", "postgres"),
+                os.getenv("DB_PASSWORD", "postgres"),
+                os.getenv("DB_HOST", "127.0.0.1"),
+                os.getenv("DB_PORT", "5432"),
+                os.getenv("DB_NAME", "postgres"),
+            )
+        )
         self._session_local = sessionmaker(
             autocommit=False, autoflush=False, bind=self._connection
         )

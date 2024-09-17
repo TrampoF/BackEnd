@@ -1,7 +1,7 @@
 from logging.config import fileConfig
 import os
 
-from sqlalchemy import engine_from_config
+from sqlalchemy import create_engine, engine_from_config
 from sqlalchemy import pool
 
 from alembic import context
@@ -26,6 +26,16 @@ target_metadata = None
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
 
+def get_url() -> str:
+    """Get the database URL from the environment variable."""
+    return "postgresql://%s:%s@%s:%s/%s" % (
+        os.getenv("DB_USER", "postgres"),
+        os.getenv("DB_PASSWORD", "postgres"),
+        os.getenv("DB_HOST", "127.0.0.1"),
+        os.getenv("DB_PORT", "5432"),
+        os.getenv("DB_NAME", "postgres"),
+    )
+
 
 def run_migrations_offline() -> None:
     """Run migrations in 'offline' mode.
@@ -39,7 +49,8 @@ def run_migrations_offline() -> None:
     script output.
 
     """
-    url = config.get_main_option("sqlalchemy.url")
+    url = get_url()
+
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -58,16 +69,10 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
-    connectable = engine_from_config(
-        config.get_section(config.config_ini_section, {}),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )
+    connectable = create_engine(get_url())
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()
