@@ -1,4 +1,3 @@
-import datetime
 import uuid
 from pydantic import (
     BaseModel,
@@ -9,6 +8,7 @@ from pydantic import (
 )
 from pydantic_core import PydanticCustomError
 
+from app.exceptions.email_already_taken_exception import EmailAlreadyTakenException
 from app.exceptions.invalid_email_format_exception import InvalidEmailFormatException
 from app.exceptions.password_confirmation_dot_not_match_exception import (
     PasswordConfirmationDotNotMatchException,
@@ -65,10 +65,14 @@ class RegisterProfile:
     def __init__(self, profile_repository: IProfileRepository):
         self._profile_repository = profile_repository
 
-    def execute(self, data: Input):
+    def execute(self, data: Input) -> uuid.UUID:
         """
         Executes the profile registration process.
         """
         Input.model_validate(data)
-        profile = self._profile_repository.register(data.model_dump())
-        return profile
+        existing_profile = self._profile_repository.get_by_email(data["email"])
+        if existing_profile:
+            raise EmailAlreadyTakenException()
+        profile = self._profile_repository.register(data)
+        print(profile)
+        return uuid.UUID(profile.id)

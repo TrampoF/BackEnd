@@ -1,10 +1,10 @@
-from typing import Annotated
-from fastapi import APIRouter, Depends, Form, Request
+from fastapi import APIRouter, Depends, Request, Response
+from supabase import Client
 
-from app.application.register_profile import Input as RegisterProfileInput, RegisterProfile
-from app.database.database_connection import PostgresAdapter
+from app.application.register_profile import (
+    RegisterProfile,
+)
 from app.database.supabase_adapter import SupabaseAdapter
-from app.repository.profile_repository_database import ProfileRepositoryDatabase
 from app.repository.profile_repository_supabase import ProfileRepositorySupabase
 
 
@@ -14,13 +14,21 @@ router = APIRouter(
 )
 
 
-@router.post("/register")
+@router.post("/register", status_code=200)
 async def register_user(
-    request: Annotated[RegisterProfileInput, Form()],
-    profile_repository: ProfileRepositorySupabase = Depends(),
+    request: Request,
+    response: Response,
+    client: Client = Depends(SupabaseAdapter().get_db),
 ):
     """
     Register a profile.
     """
-    res = RegisterProfile(profile_repository=profile_repository).execute(request)
-    return res
+    try:
+        async with request.form() as form:
+            profile = RegisterProfile(
+                profile_repository=ProfileRepositorySupabase(client=client)
+            ).execute(dict(form))
+        return profile
+    except Exception as e:
+        response.status_code = 400
+        return {"error": str(e)}

@@ -1,5 +1,5 @@
 from uuid import UUID
-from pydantic import BaseModel
+from pydantic import BaseModel, computed_field
 from app.repository.i_profile_repository import IProfileRepository
 
 
@@ -11,8 +11,15 @@ class Output(BaseModel):
     id: UUID
     first_name: str
     last_name: str
-    full_name: str
     email: str
+
+    @computed_field
+    @property
+    def full_name(self) -> str:
+        """
+        Returns the full name of the user.
+        """
+        return f"{self.first_name} {self.last_name}"
 
 
 class GetProfile:
@@ -33,5 +40,4 @@ class GetProfile:
         profile = self._profile_repository.get_by_id(profile_id=profile_id)
         if profile is None:
             return None
-        profile["full_name"] = f'{profile["first_name"]} {profile["last_name"]}'
-        return Output(**profile)
+        return Output(**profile.__dict__)

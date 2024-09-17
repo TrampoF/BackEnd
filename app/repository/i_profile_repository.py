@@ -1,6 +1,8 @@
 from abc import ABC, abstractmethod
 from uuid import UUID
 
+from app.models.profile import Profile
+
 
 class IProfileRepository(ABC):
     """
@@ -14,19 +16,19 @@ class IProfileRepository(ABC):
         """
 
     @abstractmethod
-    def create_profile(self, profile: dict):
+    def get_by_id(self, profile_id: UUID) -> Profile | None:
         """
-        Insert profile into profiles table
-        """
-
-    @abstractmethod
-    def get_by_id(self, profile_id: UUID):
-        """
-        Retrieve an [rpfile] by id
+        Retrieve an profiles by id
         """
 
     @abstractmethod
-    def register(self, profile: dict):
+    def register(self, profile: dict) -> Profile:
         """
-        Register a new user
+        Register a new user and creates a profile.
+        """
+
+    @abstractmethod
+    def get_by_email(self, email: str) -> Profile | None:
+        """
+        Retrieve a profile by email.
         """

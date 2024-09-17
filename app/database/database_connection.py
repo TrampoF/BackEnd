@@ -2,7 +2,7 @@ import os
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import declarative_base
 
 from app.database.i_database_connection import IDatabaseConnection
 
@@ -32,6 +32,6 @@ class PostgresAdapter(IDatabaseConnection):
     def get_db(self):
         db = self._session_local()
         try:
-            return db
+            yield db
         finally:
             db.close()
