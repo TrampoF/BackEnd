@@ -1,6 +1,7 @@
 import uuid
 from pydantic import (
     BaseModel,
+    ConfigDict,
     Field,
     ValidationInfo,
     field_validator,
@@ -20,6 +21,8 @@ class Input(BaseModel):
     """
     Data transfer object for profile registration.
     """
+
+    model_config = ConfigDict(extra="ignore", from_attributes=True)
 
     first_name: str = Field(..., min_length=1)
     last_name: str = Field(..., min_length=1)
@@ -69,10 +72,9 @@ class RegisterProfile:
         """
         Executes the profile registration process.
         """
-        Input.model_validate(data)
-        existing_profile = self._profile_repository.get_by_email(data["email"])
+        data = Input.model_validate(data)
+        existing_profile = self._profile_repository.get_profile_by_email(data.email)
         if existing_profile:
             raise EmailAlreadyTakenException()
         profile = self._profile_repository.register(data)
-        print(profile)
-        return uuid.UUID(profile.id)
+        return profile.id

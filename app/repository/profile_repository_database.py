@@ -16,13 +16,19 @@ class ProfileRepositoryDatabase(IProfileRepository):
     ) -> None:
         self._session = session
 
-    def get_all(self) -> list[Profile]:
+    def get_profiles(self) -> list[Profile]:
         profiles = self._session.query(Profile).all()
         return profiles
 
-    def get_by_id(self, profile_id) -> None | Profile:
+    def get_profile_by_id(self, profile_id) -> None | Profile:
         profile = self._session.query(Profile).filter(Profile.id == profile_id).first()
         return profile
 
-    def create_profile(self, profile: dict) -> None:
-        self._session.add(Profile(**profile))
+    def register(self, profile_data) -> Profile:
+        profile = Profile(**profile_data.model_dump())
+        self._session.add(profile)
+        return profile
+
+    def get_profile_by_email(self, email) -> None | Profile:
+        profile = self._session.query(Profile).filter(Profile.email == email).first()
+        return profile

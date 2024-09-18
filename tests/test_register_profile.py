@@ -10,6 +10,7 @@ from app.exceptions.password_confirmation_dot_not_match_exception import (
     PasswordConfirmationDotNotMatchException,
 )
 from app.exceptions.email_already_taken_exception import EmailAlreadyTakenException
+from app.repository.profile_repository_memory import ProfileRepositoryMemory
 from app.repository.profile_repository_supabase import ProfileRepositorySupabase
 
 
@@ -30,7 +31,7 @@ def profile_repository(db):
     """
     Fixture for profile repository.
     """
-    return ProfileRepositorySupabase(client=db)
+    return ProfileRepositoryMemory()
 
 
 class TestRegisterProfile:

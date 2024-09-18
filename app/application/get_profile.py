@@ -37,7 +37,7 @@ class GetProfile:
         Retrieves an users from the user
         repository using its id and converts them to Output objects.
         """
-        profile = self._profile_repository.get_by_id(profile_id=profile_id)
+        profile = self._profile_repository.get_profile_by_id(profile_id=profile_id)
         if profile is None:
             return None
         return Output(**profile.__dict__)
