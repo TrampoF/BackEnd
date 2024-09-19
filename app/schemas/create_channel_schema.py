@@ -9,3 +9,5 @@ class CreateChannelSchema(BaseModel):
     chat_identifier: str
     channel_name: str
     tags: list[str]
+    api_id: str
+    api_hash: str

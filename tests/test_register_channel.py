@@ -8,6 +8,7 @@ from supabase import create_client
 from app.application.get_channel import GetChannel
 from app.application.register_channel import RegisterChannel
 from app.application.register_profile import RegisterProfile
+from app.queue.rabbitmq_adapter import RabbitMQAdapter
 from app.repository.channel_repository_database import ChannelRepositoryDatabase
 from app.repository.channel_repository_memory import ChannelRepositoryMemory
 from app.repository.profile_repository_database import ProfileRepositoryDatabase
@@ -52,6 +53,7 @@ def repositories(db, supabase):
 
 class TestRegisterChannel:
     def test_should_register_channel(self, repositories):
+        queue = RabbitMQAdapter()
         profile_data = {
             "first_name": "Foo",
             "last_name": "Bar",
@@ -67,11 +69,12 @@ class TestRegisterChannel:
             "channel_name": "Lorem Ipsum",
             "profile_id": registered_profile_id,
             "tags": ["CSS", "HTML", "PHP"],
-            "chat_identifier": "https://t.me/s/CafeinaVagas",
+            "chat_identifier": "https://t.me/CafeinaVagas",
         }
         registered_channel1_id = RegisterChannel(
             channel_repository=repositories["channel_repository"],
             tag_repository=repositories["tag_repository"],
+            queue=queue,
         ).execute(channel_data=channel_data1)
         registered_channel1 = GetChannel(
             channel_repository=repositories["channel_repository"]
@@ -90,6 +93,7 @@ class TestRegisterChannel:
         registered_channel2_id = RegisterChannel(
             channel_repository=repositories["channel_repository"],
             tag_repository=repositories["tag_repository"],
+            queue=queue,
         ).execute(channel_data=channel_data2)
         registered_channel2 = GetChannel(
             channel_repository=repositories["channel_repository"]

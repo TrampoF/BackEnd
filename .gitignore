@@ -68,7 +68,7 @@ instance/
 # Scrapy stuff:
 .scrapy
 
-# Sphinx documentation
+# Sphinx `doc`umentation
 docs/_build/
 
 # PyBuilder
@@ -163,3 +163,5 @@ cython_debug/
 
 #vscode
 .vscode/
+
+.docker

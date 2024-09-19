@@ -4,7 +4,6 @@ import datetime
 from sqlalchemy.orm import Session
 from app.models.channel import Channel
 from app.models.tag import Tag
-from app.models.tags_channels import TagsChannels
 from app.repository.i_channel_repository import IChannelRepository
 from app.schemas.create_channel_schema import CreateChannelSchema
 
@@ -22,6 +21,8 @@ class ChannelRepositoryDatabase(IChannelRepository):
         channel = Channel(
             chat_identifier=channel_data.chat_identifier,
             channel_name=channel_data.channel_name,
+            api_id=channel_data.api_id,
+            api_hash=channel_data.api_hash,
             profile_id=channel_data.profile_id,
             created_at=datetime.datetime.now(),
             updated_at=datetime.datetime.now(),

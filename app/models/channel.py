@@ -32,6 +32,8 @@ class Channel(Base):
     profile_id: Mapped[UUID] = mapped_column(ForeignKey("profiles.id"))
     chat_identifier: Mapped[str]
     channel_name: Mapped[str]
+    api_id: Mapped[str]
+    api_hash: Mapped[str]
     created_at: Mapped[datetime.datetime]
     updated_at: Mapped[datetime.datetime]
 

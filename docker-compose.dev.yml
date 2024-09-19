@@ -1,5 +1,6 @@
 services:
   app:
+    container_name: trampof_app
     build:
       context: .
       dockerfile: docker/app.Dockerfile.dev
@@ -7,3 +8,24 @@ services:
       - .env
     volumes:
       - .:/home/dev/app
+    networks:
+      - app
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: trampof_rabbitmq
+    ports:
+      - 15672:15672
+      - 5672:5672
+      - 25676:25676
+    env_file:
+      - .env
+    volumes:
+      - ./.docker/rabbitmq/data/:/var/lib/rabbitmq/
+      - ./.docker/rabbitmq/log/:/var/log/rabbitmq
+    networks:
+      - app
+
+networks:
+  app:
+    driver: bridge
